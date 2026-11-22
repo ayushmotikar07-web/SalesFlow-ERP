@@ -10,7 +10,7 @@ db = SQLAlchemy()
 
 from app import models
 from app.models import User
-
+from app.routes.customers import customers_bp
 from app.routes.auth import auth_bp
 
 
@@ -33,6 +33,7 @@ def create_app():
 
     
     app.register_blueprint(auth_bp)
+    app.register_blueprint(customers_bp)
 
     @app.route("/")
     def home():
