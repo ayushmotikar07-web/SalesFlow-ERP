@@ -29,7 +29,7 @@ class SalesOrder(db.Model):
         nullable=False
     )
 
-    status = db.Column(db.String(20), default="draft", nullable=False)
+    status = db.Column(db.String(20), default="Draft", nullable=False)
 
     discount_percent = db.Column(
         db.Numeric(5, 2),

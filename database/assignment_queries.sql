@@ -5,7 +5,7 @@ SELECT
     SUM(so.grand_total) AS total_sales
 FROM customers c
 JOIN sales_orders so ON so.customer_id = c.id
-WHERE so.status = 'confirmed'
+WHERE so.status = 'Confirmed'
 GROUP BY c.id, c.customer_name
 ORDER BY total_sales DESC
 LIMIT 3;
@@ -20,7 +20,7 @@ SELECT
 FROM products p
 JOIN sales_order_items soi ON soi.product_id = p.id
 JOIN sales_orders so ON so.id = soi.sales_order_id
-WHERE so.status = 'confirmed'
+WHERE so.status = 'Confirmed'
 GROUP BY p.id, p.product_code, p.product_name
 ORDER BY total_quantity_sold DESC
 LIMIT 3;
@@ -46,7 +46,7 @@ SELECT
     MONTH(order_date) AS sales_month,
     SUM(grand_total) AS total_sales
 FROM sales_orders
-WHERE status = 'confirmed'
+WHERE status = 'Confirmed'
 GROUP BY YEAR(order_date), MONTH(order_date)
 ORDER BY sales_year, sales_month;
 

@@ -26,7 +26,7 @@ CREATE TABLE products (
     category VARCHAR(100),
     price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
     stock_quantity INT NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
-    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    status VARCHAR(20) NOT NULL DEFAULT 'Active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_product_name (product_name)
 );
@@ -37,7 +37,7 @@ CREATE TABLE sales_orders (
     customer_id INT NOT NULL,
     user_id INT NOT NULL,
     order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20) NOT NULL DEFAULT 'draft',
+    status VARCHAR(20) NOT NULL DEFAULT 'Draft',
     discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0
         CHECK (discount_percent BETWEEN 0 AND 20),
     subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,

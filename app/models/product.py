@@ -19,7 +19,7 @@ class Product(db.Model):
 
     stock_quantity = db.Column(db.Integer, default=0, nullable=False)
 
-    status = db.Column(db.String(20), default="active", nullable=False)
+    status = db.Column(db.String(20), default="Active", nullable=False)
 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 

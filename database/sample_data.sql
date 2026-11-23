@@ -11,6 +11,6 @@ VALUES
 INSERT INTO products
 (product_code, product_name, category, price, stock_quantity, status)
 VALUES
-('PRD-001', 'Wireless Mouse', 'Electronics', 599.00, 50, 'active'),
-('PRD-002', 'USB Keyboard', 'Electronics', 899.00, 30, 'active'),
-('PRD-003', 'Laptop Stand', 'Accessories', 749.00, 20, 'active');
+('PRD-001', 'Wireless Mouse', 'Electronics', 599.00, 50, 'Active'),
+('PRD-002', 'USB Keyboard', 'Electronics', 899.00, 30, 'Active'),
+('PRD-003', 'Laptop Stand', 'Accessories', 749.00, 20, 'Active');
