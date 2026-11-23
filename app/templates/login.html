@@ -1,95 +1,104 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SalesFlow ERP Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalesFlow ERP | Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            margin: 0; min-height: 100vh; display: grid; place-items: center;
+            background: linear-gradient(135deg,#101c35,#1c3852);
+            font-family: 'DM Sans',sans-serif; padding: 20px;
         }
-
-        .login-box {
-            background: white;
-            padding: 35px;
-            width: 320px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px #0002;
+        .login-card {
+            width: 100%; max-width: 420px; background: white;
+            border-radius: 18px; padding: 38px;
+            box-shadow: 0 25px 80px #0004;
         }
-
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            box-sizing: border-box;
+        .brand { font: 800 27px 'Manrope'; color: #15243e; letter-spacing: -1px; }
+        .brand span { color: #15947f; }
+        .tagline { color: #8a95a7; font-size: 13px; margin-top: 7px; }
+        h2 { font: 700 22px 'Manrope'; margin: 35px 0 7px; color: #1a2940; }
+        .desc { color: #8792a4; font-size: 13px; margin-bottom: 25px; }
+        label { display: block; font-size: 12px; font-weight: 700; margin: 15px 0 7px; color: #40506a; }
+        input {
+            width: 100%; padding: 13px; border: 1px solid #dfe5ee;
+            border-radius: 8px; outline: none; font-size: 14px;
         }
-
+        input:focus { border-color: #15947f; box-shadow: 0 0 0 3px #15947f18; }
         button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            cursor: pointer;
+            width: 100%; margin-top: 24px; padding: 14px;
+            border: 0; border-radius: 8px; background: #167d70;
+            color: white; font-weight: 700; cursor: pointer;
         }
-
-        #message {
-            color: red;
-            overflow-wrap: anywhere;
-        }
+        button:hover { background: #10685e; }
+        button:disabled { opacity: .6; cursor: wait; }
+        #message { font-size: 12px; margin-top: 15px; overflow-wrap: anywhere; }
+        .footer { margin-top: 28px; text-align: center; font-size: 11px; color: #9aa3b2; }
     </style>
 </head>
-
 <body>
-    <div class="login-box">
-        <h2>SalesFlow ERP</h2>
-        <p>Login to your account</p>
+    <div class="login-card">
+        <div class="brand">Sales<span>Flow</span></div>
+        <div class="tagline">BUSINESS MANAGEMENT SYSTEM</div>
 
-        <input id="username" placeholder="Username">
-        <input id="password" type="password" placeholder="Password">
+        <h2>Welcome</h2>
+        <p class="desc">Sign in to access your business workspace.</p>
 
-        <button type="button" onclick="login()">Login</button>
+        <form id="login-form">
+            <label for="username">USERNAME</label>
+            <input id="username" autocomplete="username" placeholder="Enter your username" required>
+
+            <label for="password">PASSWORD</label>
+            <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+
+            <button id="login-button" type="submit">Sign In to Dashboard</button>
+        </form>
 
         <p id="message"></p>
+        <div class="footer">SalesFlow ERP · Secure Business Workspace</div>
     </div>
 
     <script>
-        async function login() {
+        document.getElementById("login-form").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
             const message = document.getElementById("message");
-            message.innerText = "Checking login details...";
+            const button = document.getElementById("login-button");
+
+            message.style.color = "#c03932";
+            message.textContent = "Signing in...";
+            button.disabled = true;
 
             try {
                 const response = await fetch("/api/auth/login", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: {"Content-Type": "application/json"},
                     credentials: "same-origin",
                     body: JSON.stringify({
-                        username: document.getElementById("username").value,
+                        username: document.getElementById("username").value.trim(),
                         password: document.getElementById("password").value
                     })
                 });
 
                 const result = await response.json();
 
-                if (response.ok) {
-                    message.style.color = "green";
-                    message.innerText = "Login successful!";
-
-                    window.location.href = "/";
-                } else {
-                    message.style.color = "red";
-                    message.innerText = result.error || "Login failed";
+                if (!response.ok) {
+                    throw new Error(result.error || "Invalid login details");
                 }
 
+                message.style.color = "#16805e";
+                message.textContent = "Login successful. Opening dashboard...";
+
+                window.location.href = "/";
             } catch (error) {
-                message.style.color = "red";
-                message.innerText = "Error: " + error.message;
+                message.textContent = error.message;
+                button.disabled = false;
             }
-        }
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+
+product_code,product_name,category,price,stock_quantity,status
+PRD002,Wireless Mouse,Accessories,599.00,50,Active
+PRD003,Mechanical Keyboard,Accessories,2499.00,25,Active
+PRD004,USB Cable,Accessories,199.00,100,Active
+PRD005,Monitor,Electronics,12000.00,10,Active

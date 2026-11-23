@@ -1,0 +1,6 @@
+
+product_code,product_name,category,price,stock_quantity,status
+PRD006,Webcam,Electronics,2500.00,15,Active
+PRD007,Headphones,Accessories,-500,10,Active
+PRD008,Speaker,Electronics,1500.00,-5,Active
+PRD009,Keyboard,Accessories,invalid,20,Active
