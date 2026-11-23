@@ -1,0 +1,490 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalesFlow ERP | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'DM Sans', sans-serif; background: #f5f7fb; color: #172033; }
+        button, input, select { font: inherit; }
+        .app { display: flex; min-height: 100vh; }
+        .sidebar { width: 245px; background: #111c35; color: white; padding: 25px 16px; position: fixed; inset: 0 auto 0 0; display: flex; flex-direction: column; z-index: 5; }
+        .brand { font: 800 22px 'Manrope'; padding: 4px 12px 30px; letter-spacing: -.8px; }
+        .brand span { color: #65d6bd; }
+        .nav-label { color: #8794ae; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; padding: 12px; }
+        .nav-btn { display: flex; align-items: center; gap: 12px; color: #c5cee0; background: transparent; border: 0; width: 100%; padding: 12px; border-radius: 9px; text-align: left; cursor: pointer; margin: 2px 0; }
+        .nav-btn:hover, .nav-btn.active { background: #263653; color: white; }
+        .nav-btn.active { box-shadow: inset 3px 0 #65d6bd; }
+        .nav-icon { width: 20px; text-align: center; font-size: 17px; }
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid #2a3852; padding: 18px 8px 0; color: #c5cee0; font-size: 13px; }
+        .main { margin-left: 245px; width: calc(100% - 245px); padding: 28px 34px 50px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 16px; }
+        h1 { font: 800 26px 'Manrope'; margin: 0; letter-spacing: -.7px; }
+        .subtitle { color: #8490a4; font-size: 13px; margin-top: 5px; }
+        .user-pill { background: white; border: 1px solid #e8ecf3; border-radius: 30px; padding: 9px 15px; font-size: 13px; }
+        .user-pill strong { color: #1d8b79; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+        .stat, .panel { background: white; border: 1px solid #e9edf4; border-radius: 13px; padding: 20px; box-shadow: 0 3px 12px #1d2d4a08; }
+        .stat-label { color: #8590a3; font-size: 12px; font-weight: 600; }
+        .stat-value { font: 800 27px 'Manrope'; margin-top: 10px; }
+        .stat-note { color: #1b9b7c; font-size: 11px; margin-top: 5px; }
+        .panel { margin-bottom: 18px; }
+        .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 17px; }
+        h2 { font: 700 16px 'Manrope'; margin: 0; }
+        .muted { color: #8791a3; font-size: 12px; }
+        .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .btn { background: #167d70; border: 0; color: white; border-radius: 8px; padding: 10px 15px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .btn:hover { background: #10685e; }
+        .btn.secondary { background: #edf2f7; color: #334155; }
+        .btn.danger { background: #fff0ef; color: #c03932; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        input, select { border: 1px solid #dfe5ee; border-radius: 8px; padding: 10px 11px; background: white; color: #263247; min-width: 0; }
+        input:focus, select:focus { outline: 2px solid #b8e6dc; border-color: #56b8a5; }
+        .toolbar input { flex: 1; min-width: 180px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .form-grid input, .form-grid select { width: 100%; }
+        .form-grid .full { grid-column: 1 / -1; }
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; font-size: 12px; white-space: nowrap; }
+        th { color: #8993a5; font-weight: 600; text-align: left; background: #f8fafc; }
+        th, td { padding: 13px 12px; border-bottom: 1px solid #edf0f5; }
+        td { color: #39465b; }
+        .status { display: inline-block; border-radius: 20px; padding: 5px 9px; font-size: 10px; font-weight: 700; background: #e5f7f0; color: #14805e; }
+        .status.draft { background: #fff5df; color: #a66a0b; }
+        .status.cancelled { background: #fff0ef; color: #c03932; }
+        .message { margin: 12px 0; padding: 11px 13px; border-radius: 8px; font-size: 12px; display: none; }
+        .message.show { display: block; }
+        .message.error { background: #fff0ef; color: #b8322a; }
+        .message.success { background: #e9f8f2; color: #147657; }
+        .empty { padding: 25px; text-align: center; color: #8993a5; font-size: 13px; }
+        .order-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 9px; margin-bottom: 9px; }
+        .order-row select, .order-row input { width: 100%; }
+        .mobile-menu { display: none; }
+        @media(max-width: 1000px) { .cards { grid-template-columns: repeat(2, 1fr); } .main { padding: 24px; } }
+        @media(max-width: 700px) {
+            .sidebar { transform: translateX(-100%); transition: .2s; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; width: 100%; padding: 20px 14px; }
+            .mobile-menu { display: inline-block; }
+            .grid-two { grid-template-columns: 1fr; }
+            .cards { gap: 9px; }
+            .stat { padding: 14px; }
+            .stat-value { font-size: 21px; }
+            h1 { font-size: 21px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">Sales<span>Flow</span></div>
+        <div class="nav-label">WORKSPACE</div>
+        <button class="nav-btn active" data-page="overview"><span class="nav-icon">▦</span> Dashboard</button>
+        <button class="nav-btn" data-page="customers"><span class="nav-icon">♙</span> Customers</button>
+        <button class="nav-btn" data-page="products"><span class="nav-icon">▣</span> Products</button>
+        <button class="nav-btn" data-page="orders"><span class="nav-icon">▤</span> Sales Orders</button>
+        <div class="nav-label">OPERATIONS</div>
+        <button class="nav-btn" data-page="inventory"><span class="nav-icon">◫</span> Inventory</button>
+        <button class="nav-btn" data-page="reports"><span class="nav-icon">▥</span> Reports</button>
+        <button class="nav-btn" data-page="imports"><span class="nav-icon">⇧</span> CSV Import</button>
+        <div class="sidebar-bottom">
+            <div id="user-name">Signed in</div>
+            <div class="muted" style="color:#8794ae;margin:5px 0 13px" id="user-role"></div>
+            <button class="nav-btn" id="logout-btn">↪ &nbsp; Logout</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="btn secondary mobile-menu" id="menu-btn">☰</button>
+                <h1 id="page-title">Dashboard Overview</h1>
+                <div class="subtitle">Manage your business operations in one place.</div>
+            </div>
+            <div class="user-pill">Workspace <strong>● Active</strong></div>
+        </header>
+
+        <div id="global-message" class="message"></div>
+
+        <section class="page active" id="page-overview">
+            <div class="cards">
+                <div class="stat"><div class="stat-label">TOTAL CUSTOMERS</div><div class="stat-value" id="stat-customers">—</div><div class="stat-note">Customer records</div></div>
+                <div class="stat"><div class="stat-label">ACTIVE PRODUCTS</div><div class="stat-value" id="stat-products">—</div><div class="stat-note">Products in catalogue</div></div>
+                <div class="stat"><div class="stat-label">TOTAL ORDERS</div><div class="stat-value" id="stat-orders">—</div><div class="stat-note">All order statuses</div></div>
+                <div class="stat"><div class="stat-label">CONFIRMED SALES</div><div class="stat-value" id="stat-sales">—</div><div class="stat-note">Confirmed order value</div></div>
+            </div>
+            <div class="grid-two">
+                <div class="panel">
+                    <div class="panel-head"><h2>Recent Sales Orders</h2><button class="btn secondary" onclick="showPage('orders')">View orders</button></div>
+                    <div class="table-wrap"><table><thead><tr><th>ORDER</th><th>STATUS</th><th>TOTAL</th></tr></thead><tbody id="recent-orders"></tbody></table></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><h2>Low Stock Alerts</h2><button class="btn secondary" onclick="showPage('inventory')">Inventory</button></div>
+                    <div class="table-wrap"><table><thead><tr><th>PRODUCT</th><th>AVAILABLE</th></tr></thead><tbody id="low-stock-preview"></tbody></table></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page" id="page-customers">
+            <div class="panel">
+                <div class="panel-head"><h2>Customer Management</h2><span class="muted">Manage your customer directory</span></div>
+                <form id="customer-form" class="form-grid">
+                    <input name="customer_name" placeholder="Customer name" required>
+                    <input name="email" type="email" placeholder="Email">
+                    <input name="phone" placeholder="Phone">
+                    <input name="address" placeholder="Address">
+                    <button class="btn full" type="submit">Add Customer</button>
+                </form>
+                <div id="customer-message" class="message"></div>
+            </div>
+            <div class="panel">
+                <div class="toolbar"><input id="customer-search" placeholder="Search customers..."><button class="btn secondary" onclick="loadCustomers()">Refresh</button></div>
+                <div class="table-wrap"><table><thead><tr><th>ID</th><th>NAME</th><th>EMAIL</th><th>PHONE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="customers-table"></tbody></table></div>
+            </div>
+        </section>
+
+        <section class="page" id="page-products">
+            <div class="panel">
+                <div class="panel-head"><h2>Product Catalogue</h2><span class="muted">Manage products and pricing</span></div>
+                <form id="product-form" class="form-grid">
+                    <input name="product_code" placeholder="Product code (e.g. PRD010)" required>
+                    <input name="product_name" placeholder="Product name" required>
+                    <input name="category" placeholder="Category" required>
+                    <input name="price" type="number" min="0" step="0.01" placeholder="Price" required>
+                    <input name="stock_quantity" type="number" min="0" step="1" placeholder="Opening stock" required>
+                    <select name="status"><option>Active</option><option>Inactive</option></select>
+                    <button class="btn full" type="submit">Add Product</button>
+                </form>
+                <div id="product-message" class="message"></div>
+            </div>
+            <div class="panel">
+                <div class="toolbar"><input id="product-search" placeholder="Search products..."><button class="btn secondary" onclick="loadProducts()">Refresh</button></div>
+                <div class="table-wrap"><table><thead><tr><th>CODE</th><th>PRODUCT</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="products-table"></tbody></table></div>
+            </div>
+        </section>
+
+        <section class="page" id="page-orders">
+            <div class="panel">
+                <div class="panel-head"><h2>Create Sales Order</h2><span class="muted">Draft order · Stock changes on confirmation</span></div>
+                <form id="order-form">
+                    <div class="form-grid">
+                        <select id="order-customer" required><option value="">Select customer</option></select>
+                        <input id="discount" type="number" min="0" max="20" step="0.01" value="0" placeholder="Discount %">
+                    </div>
+                    <div style="margin:18px 0 10px;font-weight:700;font-size:13px">Order items</div>
+                    <div id="order-items"></div>
+                    <div class="toolbar"><button type="button" class="btn secondary" id="add-order-row">+ Add product</button></div>
+                    <button class="btn" type="submit">Create Draft Order</button>
+                </form>
+                <div id="order-message" class="message"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-head"><h2>Sales Orders</h2><button class="btn secondary" onclick="loadOrders()">Refresh</button></div>
+                <div class="table-wrap"><table><thead><tr><th>ORDER NO.</th><th>CUSTOMER</th><th>DATE</th><th>STATUS</th><th>GRAND TOTAL</th><th>ACTIONS</th></tr></thead><tbody id="orders-table"></tbody></table></div>
+            </div>
+        </section>
+
+        <section class="page" id="page-inventory">
+            <div class="panel">
+                <div class="panel-head"><h2>Manual Stock Adjustment</h2><span class="muted">Admin only</span></div>
+                <form id="adjust-form" class="form-grid">
+                    <select id="adjust-product" required><option value="">Select product</option></select>
+                    <input id="adjust-quantity" type="number" step="1" placeholder="Quantity change (+/-)" required>
+                    <input id="adjust-reason" class="full" placeholder="Reason for adjustment" required>
+                    <button class="btn full" type="submit">Save Adjustment</button>
+                </form>
+                <div id="inventory-message" class="message"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-head"><h2>Stock Movement History</h2><button class="btn secondary" onclick="loadMovements()">Refresh</button></div>
+                <div class="table-wrap"><table><thead><tr><th>DATE</th><th>PRODUCT</th><th>TYPE</th><th>CHANGE</th><th>REASON</th></tr></thead><tbody id="movements-table"></tbody></table></div>
+            </div>
+        </section>
+
+        <section class="page" id="page-reports">
+            <div class="panel">
+                <div class="panel-head"><h2>Business Reports</h2><button class="btn secondary" onclick="loadReports()">Refresh reports</button></div>
+                <div class="grid-two">
+                    <div><h2 style="margin-bottom:12px">Customer Sales</h2><div class="table-wrap"><table><thead><tr><th>CUSTOMER</th><th>ORDERS</th><th>SALES</th></tr></thead><tbody id="customer-report"></tbody></table></div></div>
+                    <div><h2 style="margin-bottom:12px">Product Sales</h2><div class="table-wrap"><table><thead><tr><th>PRODUCT</th><th>QTY SOLD</th><th>SALES</th></tr></thead><tbody id="product-report"></tbody></table></div></div>
+                    <div><h2 style="margin:20px 0 12px">Monthly Sales</h2><div class="table-wrap"><table><thead><tr><th>MONTH</th><th>ORDERS</th><th>SALES</th></tr></thead><tbody id="monthly-report"></tbody></table></div></div>
+                    <div><h2 style="margin:20px 0 12px">Customers Without Orders</h2><div class="table-wrap"><table><thead><tr><th>CUSTOMER</th><th>EMAIL</th></tr></thead><tbody id="no-order-report"></tbody></table></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page" id="page-imports">
+            <div class="panel">
+                <div class="panel-head"><h2>Import Products from CSV</h2><span class="muted">Admin only</span></div>
+                <p class="muted">Required columns: product_code, product_name, category, price, stock_quantity, status</p>
+                <form id="import-form">
+                    <input type="file" id="csv-file" accept=".csv" required>
+                    <button class="btn" type="submit" style="margin-left:8px">Upload CSV</button>
+                </form>
+                <div id="import-message" class="message"></div>
+                <p class="muted">Use the sample file in samples/valid_products.csv as a format reference.</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const state = { customers: [], products: [], orders: [], role: "" };
+const titles = {
+    overview: "Dashboard Overview", customers: "Customer Management",
+    products: "Product Catalogue", orders: "Sales Orders",
+    inventory: "Inventory Management", reports: "Business Reports",
+    imports: "CSV Product Import"
+};
+
+function money(value) {
+    return "₹" + Number(value || 0).toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+function safe(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    }[c]));
+}
+function showMessage(id, message, error=false) {
+    const el = document.getElementById(id);
+    el.textContent = message;
+    el.className = "message show " + (error ? "error" : "success");
+}
+async function api(url, options={}) {
+    const response = await fetch(url, {credentials:"same-origin", ...options});
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || data.message || "Request failed");
+    return data;
+}
+function showPage(name) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById("page-" + name).classList.add("active");
+    document.querySelectorAll(".nav-btn[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === name));
+    document.getElementById("page-title").textContent = titles[name];
+    document.getElementById("sidebar").classList.remove("open");
+    if (name === "overview") loadDashboard();
+    if (name === "customers") loadCustomers();
+    if (name === "products") loadProducts();
+    if (name === "orders") { loadOrders(); loadOrderOptions(); }
+    if (name === "inventory") { loadProductOptions(); loadMovements(); }
+    if (name === "reports") loadReports();
+}
+document.querySelectorAll(".nav-btn[data-page]").forEach(b => b.addEventListener("click", () => showPage(b.dataset.page)));
+document.getElementById("menu-btn").addEventListener("click", () => document.getElementById("sidebar").classList.toggle("open"));
+
+document.getElementById("logout-btn").addEventListener("click", async () => {
+    try {
+        await api("/api/auth/logout", {method:"POST"});
+        window.location.href = "/login";
+    } catch (e) { showMessage("global-message", e.message, true); }
+});
+
+async function loadCustomers() {
+    try {
+        state.customers = await api("/api/customers/");
+        renderCustomers();
+    } catch(e) { showMessage("global-message", e.message, true); }
+}
+function renderCustomers() {
+    const search = (document.getElementById("customer-search").value || "").toLowerCase();
+    const rows = state.customers.filter(c => JSON.stringify(c).toLowerCase().includes(search));
+    document.getElementById("customers-table").innerHTML = rows.map(c => `
+        <tr><td>${c.id}</td><td>${safe(c.customer_name)}</td><td>${safe(c.email || "—")}</td>
+        <td>${safe(c.phone || "—")}</td><td><span class="status">${safe(c.is_active === false ? "Inactive" : "Active")}</span></td>
+        <td>${c.is_active === false ? "—" : `<button class="btn danger" onclick="deactivateCustomer(${c.id})">Deactivate</button>`}</td></tr>`).join("") || `<tr><td colspan="6" class="empty">No customers found</td></tr>`;
+}
+document.getElementById("customer-search").addEventListener("input", renderCustomers);
+document.getElementById("customer-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.target));
+    try {
+        await api("/api/customers/", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+        e.target.reset(); showMessage("customer-message", "Customer added successfully."); await loadCustomers();
+    } catch(err) { showMessage("customer-message", err.message, true); }
+});
+async function deactivateCustomer(id) {
+    if (!confirm("Deactivate this customer?")) return;
+    try { await api(`/api/customers/${id}`, {method:"DELETE"}); await loadCustomers(); }
+    catch(e) { showMessage("global-message", e.message, true); }
+}
+
+async function loadProducts() {
+    try {
+        state.products = await api("/api/products/");
+        renderProducts();
+    } catch(e) { showMessage("global-message", e.message, true); }
+}
+function renderProducts() {
+    const search = (document.getElementById("product-search").value || "").toLowerCase();
+    const rows = state.products.filter(p => JSON.stringify(p).toLowerCase().includes(search));
+    document.getElementById("products-table").innerHTML = rows.map(p => `
+        <tr><td>${safe(p.product_code)}</td><td>${safe(p.product_name)}</td><td>${safe(p.category || "—")}</td>
+        <td>${money(p.price)}</td><td>${p.stock_quantity}</td><td><span class="status">${safe(p.status)}</span></td>
+        <td>${p.status === "Active" ? `<button class="btn danger" onclick="deactivateProduct(${p.id})">Deactivate</button>` : "—"}</td></tr>`).join("") || `<tr><td colspan="7" class="empty">No products found</td></tr>`;
+}
+document.getElementById("product-search").addEventListener("input", renderProducts);
+document.getElementById("product-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.target));
+    body.price = Number(body.price); body.stock_quantity = Number(body.stock_quantity);
+    try {
+        await api("/api/products/", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+        e.target.reset(); showMessage("product-message", "Product added successfully."); await loadProducts();
+    } catch(err) { showMessage("product-message", err.message, true); }
+});
+async function deactivateProduct(id) {
+    if (!confirm("Deactivate this product?")) return;
+    try { await api(`/api/products/${id}`, {method:"DELETE"}); await loadProducts(); }
+    catch(e) { showMessage("global-message", e.message, true); }
+}
+
+async function loadOrders() {
+    try {
+        const data = await api("/api/orders/");
+        state.orders = Array.isArray(data) ? data : (data.orders || []);
+        document.getElementById("orders-table").innerHTML = state.orders.map(o => `
+            <tr><td>${safe(o.order_number)}</td><td>${safe(o.customer_name || "—")}</td>
+            <td>${safe(o.order_date || "—")}</td><td><span class="status ${String(o.status).toLowerCase()}">${safe(o.status)}</span></td>
+            <td>${money(o.grand_total)}</td><td>
+            ${o.status === "Draft" ? `<button class="btn" onclick="changeOrder(${o.id},'confirm')">Confirm</button> <button class="btn danger" onclick="changeOrder(${o.id},'cancel')">Cancel</button>` : o.status === "Confirmed" ? `<button class="btn danger" onclick="changeOrder(${o.id},'cancel')">Cancel</button>` : "—"}
+            </td></tr>`).join("") || `<tr><td colspan="6" class="empty">No orders available</td></tr>`;
+    } catch(e) { showMessage("order-message", "Could not load orders. " + e.message, true); }
+}
+async function loadOrderOptions() {
+    try {
+        if (!state.customers.length) await loadCustomers();
+        if (!state.products.length) await loadProducts();
+        document.getElementById("order-customer").innerHTML = `<option value="">Select customer</option>` + state.customers.filter(c => c.is_active !== false).map(c => `<option value="${c.id}">${safe(c.customer_name)}</option>`).join("");
+        if (!document.querySelector("#order-items .order-row")) addOrderRow();
+    } catch(e) { showMessage("order-message", e.message, true); }
+}
+function addOrderRow() {
+    const row = document.createElement("div");
+    row.className = "order-row";
+    row.innerHTML = `<select class="item-product" required><option value="">Select product</option>${state.products.filter(p => p.status === "Active").map(p => `<option value="${p.id}">${safe(p.product_name)} · ${money(p.price)} · Stock ${p.stock_quantity}</option>`).join("")}</select>
+    <input class="item-quantity" type="number" min="1" step="1" value="1" required>
+    <input class="item-price" value="Price from server" disabled>
+    <button type="button" class="btn danger remove-row">×</button>`;
+    row.querySelector(".remove-row").addEventListener("click", () => row.remove());
+    row.querySelector(".item-product").addEventListener("change", e => {
+        const p = state.products.find(x => String(x.id) === e.target.value);
+        row.querySelector(".item-price").value = p ? money(p.price) : "";
+    });
+    document.getElementById("order-items").appendChild(row);
+}
+document.getElementById("add-order-row").addEventListener("click", addOrderRow);
+document.getElementById("order-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const items = [...document.querySelectorAll("#order-items .order-row")].map(r => ({
+        product_id:Number(r.querySelector(".item-product").value),
+        quantity:Number(r.querySelector(".item-quantity").value)
+    }));
+    if (items.some(i => !i.product_id || !Number.isInteger(i.quantity) || i.quantity < 1)) {
+        showMessage("order-message", "Select a product and enter a whole quantity of at least 1.", true); return;
+    }
+    const body = {customer_id:Number(document.getElementById("order-customer").value), discount_percent:Number(document.getElementById("discount").value), items};
+    if (!body.customer_id) { showMessage("order-message", "Please select a customer.", true); return; }
+    try {
+        const result = await api("/api/orders/", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+        showMessage("order-message", "Draft order created: " + (result.order_number || result.order?.order_number || "Success"));
+        document.getElementById("order-items").innerHTML = ""; addOrderRow(); await loadOrders();
+    } catch(err) { showMessage("order-message", err.message, true); }
+});
+async function changeOrder(id, action) {
+    if (!confirm(`Are you sure you want to ${action} this order?`)) return;
+    try {
+        await api(`/api/orders/${id}/${action}`, {method:"POST"});
+        await loadOrders(); await loadDashboard();
+        showMessage("global-message", `Order ${action} successful.`);
+    } catch(e) { showMessage("global-message", e.message, true); }
+}
+
+async function loadProductOptions() {
+    if (!state.products.length) await loadProducts();
+    document.getElementById("adjust-product").innerHTML = `<option value="">Select product</option>` + state.products.map(p => `<option value="${p.id}">${safe(p.product_name)} (stock: ${p.stock_quantity})</option>`).join("");
+}
+document.getElementById("adjust-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const body = {product_id:Number(document.getElementById("adjust-product").value), quantity_change:Number(document.getElementById("adjust-quantity").value), reason:document.getElementById("adjust-reason").value};
+    try {
+        const result = await api("/api/inventory/adjustments", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+        showMessage("inventory-message", `Stock updated. New quantity: ${result.new_stock}`);
+        e.target.reset(); await loadProducts(); await loadMovements();
+    } catch(err) { showMessage("inventory-message", err.message, true); }
+});
+async function loadMovements() {
+    try {
+        const rows = await api("/api/inventory/movements");
+        document.getElementById("movements-table").innerHTML = rows.map(m => `<tr><td>${safe(m.created_at || "")}</td><td>${safe(m.product_name || m.product_id)}</td><td>${safe(m.movement_type)}</td><td>${m.quantity_change > 0 ? "+" : ""}${m.quantity_change}</td><td>${safe(m.reason || "—")}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">No stock movements</td></tr>`;
+    } catch(e) { showMessage("global-message", e.message, true); }
+}
+
+async function loadReports() {
+    const jobs = [
+        ["/api/reports/customer-sales", "customer-report", rows => rows.map(r => `<tr><td>${safe(r.customer_name)}</td><td>${r.order_count}</td><td>${money(r.total_sales)}</td></tr>`).join("")],
+        ["/api/reports/product-sales", "product-report", rows => rows.map(r => `<tr><td>${safe(r.product_name)}</td><td>${r.quantity_sold}</td><td>${money(r.total_sales)}</td></tr>`).join("")],
+        ["/api/reports/monthly-sales", "monthly-report", rows => rows.map(r => `<tr><td>${safe(r.month)}</td><td>${r.order_count}</td><td>${money(r.total_sales)}</td></tr>`).join("")],
+        ["/api/reports/customers-without-orders", "no-order-report", rows => rows.map(r => `<tr><td>${safe(r.customer_name)}</td><td>${safe(r.email || "—")}</td></tr>`).join("")]
+    ];
+    for (const [url, id, render] of jobs) {
+        try { const rows = await api(url); document.getElementById(id).innerHTML = render(rows) || `<tr><td colspan="3" class="empty">No data available</td></tr>`; }
+        catch(e) { document.getElementById(id).innerHTML = `<tr><td class="empty">${safe(e.message)}</td></tr>`; }
+    }
+}
+
+document.getElementById("import-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const file = document.getElementById("csv-file").files[0];
+    if (!file) { showMessage("import-message", "Choose a CSV file first.", true); return; }
+    const form = new FormData(); form.append("file", file);
+    try {
+        const result = await api("/api/imports/products", {method:"POST", body:form});
+        showMessage("import-message", result.message + " (" + result.imported_count + " products)");
+        e.target.reset(); state.products = []; await loadProducts();
+    } catch(err) { showMessage("import-message", err.message, true); }
+});
+
+async function loadDashboard() {
+    try {
+        const [customers, products, orders, low] = await Promise.all([
+            api("/api/customers/"), api("/api/products/"), api("/api/orders/"), api("/api/reports/low-stock")
+        ]);
+        state.customers = customers; state.products = products;
+        state.orders = Array.isArray(orders) ? orders : (orders.orders || []);
+        const confirmed = state.orders.filter(o => o.status === "Confirmed");
+        document.getElementById("stat-customers").textContent = customers.length;
+        document.getElementById("stat-products").textContent = products.filter(p => p.status === "Active").length;
+        document.getElementById("stat-orders").textContent = state.orders.length;
+        document.getElementById("stat-sales").textContent = money(confirmed.reduce((sum,o) => sum + Number(o.grand_total || 0), 0));
+        document.getElementById("recent-orders").innerHTML = state.orders.slice(-5).reverse().map(o => `<tr><td>${safe(o.order_number)}</td><td>${safe(o.status)}</td><td>${money(o.grand_total)}</td></tr>`).join("") || `<tr><td colspan="3" class="empty">No orders yet</td></tr>`;
+        document.getElementById("low-stock-preview").innerHTML = low.slice(0,5).map(p => `<tr><td>${safe(p.product_name)}</td><td>${p.stock_quantity}</td></tr>`).join("") || `<tr><td colspan="2" class="empty">No low-stock products</td></tr>`;
+    } catch(e) { showMessage("global-message", "Dashboard data: " + e.message, true); }
+}
+
+async function initialize() {
+    try {
+        const me = await api("/api/auth/me");
+        document.getElementById("user-name").textContent = me.username || "User";
+        document.getElementById("user-role").textContent = me.role || "";
+        state.role = me.role || "";
+        if (state.role !== "Admin") {
+            document.querySelectorAll('[data-page="imports"], [data-page="inventory"]').forEach(b => b.style.display = "none");
+            document.getElementById("adjust-form").style.display = "none";
+            document.getElementById("import-form").style.display = "none";
+        }
+        await loadDashboard();
+    } catch(e) {
+        window.location.href = "/login";
+    }
+}
+initialize();
+</script>
+</body>
+</html>
