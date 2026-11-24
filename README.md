@@ -214,15 +214,11 @@ SalesFlow-ERP/
 
 ```bash
 
-git clone YOUR\_REPOSITORY\_URL
+git clone https://github.com/ayushmotikar07-web/SalesFlow-ERP.git
 
 cd SalesFlow-ERP
 
 ```
-
-
-
-Replace `YOUR\_REPOSITORY\_URL` with the actual repository URL.
 
 
 
